@@ -2,7 +2,7 @@
 
 Keras implementation for ICONIP-2017 paper:
 
-* Xifeng Guo, Xinwang Liu, En Zhu, Jianping Yin. 
+* Xifeng Guo, Xinwang Liu, En Zhu, Jianping Yin.
 Deep Clustering with Convolutional Autoencoders. ICONIP 2017.
 
 ## Usage
@@ -18,12 +18,11 @@ Deep Clustering with Convolutional Autoencoders. ICONIP 2017.
         cd ../..
 
 4. Run experiment on MNIST.   
-`python DCEC.py mnist`     
+`python3.7 DCEC.py mnist`     
 The DCEC model will be saved to "results/temp/dcec_model_final.h5".
 
 5. Run experiment on USPS.   
-`python DCEC.py usps`   
+`python3.7 DCEC.py usps`   
 
 6. Run experiment on MNIST-TEST.   
-`python DCEC.py mnist-test`   
-
+`python3.7 myDCEC.py mnist-test`   

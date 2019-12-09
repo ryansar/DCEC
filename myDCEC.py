@@ -6,7 +6,7 @@ from keras.models import Model
 from keras.utils.vis_utils import plot_model
 from sklearn.cluster import KMeans
 import metrics
-from ConvAE import CAE
+from myConvAE import CAE
 
 
 class ClusteringLayer(Layer):
@@ -94,7 +94,7 @@ class DCEC(object):
         self.model = Model(inputs=self.cae.input,
                            outputs=[clustering_layer, self.cae.output])
 
-    def pretrain(self, x, batch_size=256, epochs=50, optimizer='adam', save_dir='results/temp'):
+    def pretrain(self, x, batch_size=256, epochs=200, optimizer='adam', save_dir='results/temp'):
         print('...Pretraining...')
         self.cae.compile(optimizer=optimizer, loss='mse')
         from keras.callbacks import CSVLogger

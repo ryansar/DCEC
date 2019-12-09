@@ -1,31 +1,30 @@
-from keras.layers import Conv2D, Conv2DTranspose, Dense, Flatten, Reshape, GlobalAveragePooling2D
+from keras.layers import Conv2D, Input, Conv2DTranspose, Dense, Flatten, Reshape, GlobalAveragePooling2D, UpSampling2D
 from keras.models import Sequential, Model
 from keras.utils.vis_utils import plot_model
+import tensorflow as tf
 import numpy as np
 
 
-def CAE(input_shape=(28, 28, 1), filters=[32, 64, 128, 10]):
-    model = Sequential()
-    if input_shape[0] % 8 == 0:
-        pad3 = 'same'
-    else:
-        pad3 = 'valid'
-    model.add(Conv2D(filters[0], 5, strides=2, padding='same', activation='relu', name='conv1', input_shape=input_shape))
+def CAE(input_shape=(28, 28, 1), filters=[10, 10, 10, 10]):
+    input_img = Input(shape=input_shape)
 
-    model.add(Conv2D(filters[1], 5, strides=2, padding='same', activation='relu', name='conv2'))
+    conv1 = Conv2D(filters[0], 5, strides=2, padding='same', activation='relu', name='conv1', input_shape=input_shape)(input_img)
+    conv2 = Conv2D(filters[1], 5, strides=2, padding='same', activation='relu', name='conv2')(conv1)
+    conv3 = Conv2D(filters[2], 3, strides=2, padding='valid', activation='relu', name='conv3')(conv2)
 
-    model.add(Conv2D(filters[2], 3, strides=2, padding=pad3, activation='relu', name='conv3'))
+    embedding = GlobalAveragePooling2D(name='embedding')(conv3)
+    # flattened = Flatten()(embedding)
+    # densed = Dense(units=filters[3], name='densed')(embedding)
+    densed2 = Dense(units=filters[2]*int(input_shape[0]/8)*int(input_shape[0]/8), activation='relu')(embedding)
 
-    model.add(Flatten()) # GlobalAveragePooling2D())
-    model.add(Dense(units=filters[3], name='embedding'))
-    model.add(Dense(units=filters[2]*int(input_shape[0]/8)*int(input_shape[0]/8), activation='relu'))
+    reshaped = Reshape((int(input_shape[0]/8), int(input_shape[0]/8), filters[2]))(densed2) # Reshape((1,1,filters[2]))(densed2)
+    # upsampled = UpSampling2D(size =(3, 3), interpolation = 'nearest')(reshaped)
 
-    model.add(Reshape((int(input_shape[0]/8), int(input_shape[0]/8), filters[2])))
-    model.add(Conv2DTranspose(filters[1], 3, strides=2, padding=pad3, activation='relu', name='deconv3'))
+    deconv3 = Conv2DTranspose(filters[1], 3, strides=2, padding='valid', activation='relu', name='deconv3')(reshaped)
+    deconv2 = Conv2DTranspose(filters[0], 5, strides=2, padding='same', activation='relu', name='deconv2')(deconv3)
+    deconv1 = Conv2DTranspose(input_shape[2], 5, strides=2, padding='same', activation='relu', name='deconv1')(deconv2)
 
-    model.add(Conv2DTranspose(filters[0], 5, strides=2, padding='same', activation='relu', name='deconv2'))
-
-    model.add(Conv2DTranspose(input_shape[2], 5, strides=2, padding='same', name='deconv1'))
+    model = Model(input_img, deconv1)
     model.summary()
     return model
 
@@ -55,7 +54,7 @@ if __name__ == "__main__":
         x, y = load_usps('data/usps')
 
     # define the model
-    model = CAE(input_shape=x.shape[1:], filters=[32, 64, 128, 10])
+    model = CAE(input_shape=x.shape[1:], filters=[10, 10, 10, 10])
     plot_model(model, to_file=args.save_dir + '/%s-pretrain-model.png' % args.dataset, show_shapes=True)
     model.summary()
 
