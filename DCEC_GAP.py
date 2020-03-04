@@ -9,7 +9,7 @@ from keras.models import Model
 from keras.utils.vis_utils import plot_model
 from sklearn.cluster import KMeans
 import metrics
-from ConvAE import CAE
+from ConvAE_GAP import CAE
 
 
 class ClusteringLayer(Layer):
@@ -75,7 +75,7 @@ class ClusteringLayer(Layer):
 class DCEC(object):
     def __init__(self,
                  input_shape,
-                 filters=[32, 64, 128, 10],
+                 filters=[64, 128, 256, 10],
                  n_clusters=10,
                  alpha=1.0):
 
@@ -252,7 +252,7 @@ if __name__ == "__main__":
         x, y = x[60000:], y[60000:]
 
     # prepare the DCEC model
-    dcec = DCEC(input_shape=x.shape[1:], filters=[32, 64, 128, 10], n_clusters=args.n_clusters)
+    dcec = DCEC(input_shape=x.shape[1:], filters=[64, 128, 256, 10], n_clusters=args.n_clusters)
     plot_model(dcec.model, to_file=args.save_dir + '/dcec_model.png', show_shapes=True)
     dcec.model.summary()
 

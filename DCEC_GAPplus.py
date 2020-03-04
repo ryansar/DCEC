@@ -9,7 +9,7 @@ from keras.models import Model
 from keras.utils.vis_utils import plot_model
 from sklearn.cluster import KMeans
 import metrics
-from ConvAE import CAE
+from ConvAE_GAPplus import CAE
 
 
 class ClusteringLayer(Layer):

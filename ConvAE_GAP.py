@@ -4,7 +4,7 @@ from keras.utils.vis_utils import plot_model
 import numpy as np
 
 
-def CAE(input_shape=(28, 28, 1), filters=[32, 64, 128, 10]):
+def CAE(input_shape=(28, 28, 1), filters=[64, 128, 256, 10]):
     model = Sequential()
     if input_shape[0] % 8 == 0:
         pad3 = 'same'
@@ -16,8 +16,8 @@ def CAE(input_shape=(28, 28, 1), filters=[32, 64, 128, 10]):
 
     model.add(Conv2D(filters[2], 3, strides=2, padding=pad3, activation='relu', name='conv3'))
 
-    model.add(Flatten())
-    model.add(Dense(units=filters[3], name='embedding'))
+    model.add(GlobalAveragePooling2D(name='embedding'))
+    # model.add(Dense(units=filters[3], name='embedding'))
     model.add(Dense(units=filters[2]*int(input_shape[0]/8)*int(input_shape[0]/8), activation='relu'))
 
     model.add(Reshape((int(input_shape[0]/8), int(input_shape[0]/8), filters[2])))
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         x, y = load_usps('data/usps')
 
     # define the model
-    model = CAE(input_shape=x.shape[1:], filters=[32, 64, 128, 10])
+    model = CAE(input_shape=x.shape[1:], filters=[64, 128, 256, 10])
     plot_model(model, to_file=args.save_dir + '/%s-pretrain-model.png' % args.dataset, show_shapes=True)
     model.summary()
 
